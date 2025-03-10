@@ -23,6 +23,7 @@ jobs:
         echo "STATIC_VOLUME_PATH=./docker/volumes/static" >> .env
         echo "MEDIA_VOLUME_PATH=./docker/volumes/media" >> .env
         cp docker-compose.sample.yml docker-compose.yml
+        cp nginx/nginx.conf.sample nginx/nginx.conf
     - name: docker compose build
       run: |
         docker compose build
