@@ -1,0 +1,37 @@
+name: test docker deployment ⚙️
+
+on: [ push, pull_request ]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: setup environment
+      run: |
+        echo "UID=${UID}" > .env
+        echo "GID=${UID}" >> .env
+        echo "SECRET_KEY=testing123" >> .env
+        echo "DB_PASSWORD=testing123" >> .env
+        echo "REDIS_PASSWORD=testing123" >> .env
+        echo "CAP_COMPOSER_WEB_PROXY_PORT=8765" >> .env
+        echo "DB_USER=cap_composer" >> .env
+        echo "DB_NAME=cap_composer" >> .env
+        echo "DB_VOLUME_PATH=./docker/volumes/db" >> .env
+        echo "BACKUP_VOLUME_PATH=./docker/volumes/backup" >> .env
+        echo "STATIC_VOLUME_PATH=./docker/volumes/static" >> .env
+        echo "MEDIA_VOLUME_PATH=./docker/volumes/media" >> .env
+        cp docker-compose.sample.yml docker-compose.yml
+        cp nginx/nginx.conf.sample nginx/nginx.conf
+    - name: docker compose build
+      run: |
+        docker compose build
+    - name: docker compose up, sleep 60 seconds and check status
+      run: |
+        docker compose up -d
+        sleep 60
+        docker ps
+    - name: check if the web server is running
+      run: |
+        curl -s http://localhost:8785
